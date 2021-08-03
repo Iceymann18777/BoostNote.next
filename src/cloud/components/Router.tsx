@@ -61,6 +61,7 @@ import EmojiPicker from '../../shared/components/molecules/EmojiPicker'
 import { NotificationsProvider } from '../../shared/lib/stores/notifications'
 import { TeamIntegrationsProvider } from '../../shared/lib/stores/integrations'
 import { TeamStorageProvider } from '../lib/stores/teamStorage'
+import { BlocksProvider } from '../lib/stores/blocks'
 
 const CombinedProvider = combineProviders(
   TeamStorageProvider,
@@ -82,7 +83,8 @@ const V2CombinedProvider = combineProviders(
   V2DialogProvider,
   CommentsProvider,
   NotificationsProvider,
-  TeamIntegrationsProvider
+  TeamIntegrationsProvider,
+  BlocksProvider
 )
 
 interface PageInfo {
