@@ -9,6 +9,7 @@ import { SerializedUser } from '../../../interfaces/db/user'
 import styled from '../../../lib/styled'
 import { rightSideTopBarHeight } from '../RightSideTopBar/styled'
 import { SerializedRevision } from '../../../interfaces/db/revision'
+import BlockEditor from '../Blocks/BlockEditor'
 
 interface EditPageProps {
   doc: SerializedDocWithBookmark
@@ -29,14 +30,18 @@ const EditPage = ({
 }: EditPageProps) => {
   return (
     <StyledDocEditPage>
-      <Editor
-        team={team}
-        doc={doc}
-        user={user}
-        contributors={contributors}
-        backLinks={backLinks}
-        revisionHistory={revisionHistory}
-      />
+      {doc.rootBlock == null ? (
+        <Editor
+          team={team}
+          doc={doc}
+          user={user}
+          contributors={contributors}
+          backLinks={backLinks}
+          revisionHistory={revisionHistory}
+        />
+      ) : (
+        <BlockEditor doc={doc as any} />
+      )}
     </StyledDocEditPage>
   )
 }
