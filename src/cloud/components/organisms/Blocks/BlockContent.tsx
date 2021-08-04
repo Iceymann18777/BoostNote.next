@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo } from 'react'
+import React, { useCallback, useState, useMemo, useEffect } from 'react'
 import { SerializedDocWithBookmark } from '../../../interfaces/db/doc'
 import { useDocBlocks, BlockActions } from '../../../lib/hooks/useDocBlocks'
 import { useModal } from '../../../../shared/lib/stores/modal'
@@ -26,6 +26,7 @@ import MarkdownView from './views/Markdown'
 import EmbedView from './views/Embed'
 import ContainerView from './views/Container'
 import GithubIssueView from './views/GithubIssue'
+import { find } from '../../../../shared/lib/utils/tree'
 
 interface Canvas extends SerializedDocWithBookmark {
   rootBlock: ContainerBlock
@@ -59,6 +60,16 @@ const BlockContent = ({ doc }: BlockContentProps) => {
     },
     [doc, actions, closeAllModals]
   )
+
+  useEffect(() => {
+    if (state.type === 'loaded') {
+      setCurrentBlock((prev) => {
+        return prev != null
+          ? find(state.block, (block) => block.id === prev.id)
+          : null
+      })
+    }
+  }, [state])
 
   const modalOptions = useMemo(() => {
     return {
@@ -113,6 +124,7 @@ const BlockContent = ({ doc }: BlockContentProps) => {
       <div className='block__editor__nav'>
         <BlockTree
           root={state.block}
+          active={currentBlock || doc.rootBlock}
           onSelect={setCurrentBlock}
           onDelete={actions.remove}
         />
