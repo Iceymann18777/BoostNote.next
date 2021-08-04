@@ -16,6 +16,7 @@ import { useModal } from '../../../../../shared/lib/stores/modal'
 import MarkdownForm from '../forms/MarkdownForm'
 import TableForm from '../forms/TableForm'
 import EmbedForm from '../forms/EmbedForm'
+import AspectRatio from '../../../../../shared/components/atoms/AspectRation'
 
 interface ContainerViewProps extends ViewProps<ContainerBlock> {
   nested?: boolean
@@ -76,7 +77,9 @@ const ContainerView = ({
               )
             case 'embed':
               return (
-                <EmbedView block={child} actions={actions} canvas={canvas} />
+                <AspectRatio width={16} height={9}>
+                  <EmbedView block={child} actions={actions} canvas={canvas} />
+                </AspectRatio>
               )
             case 'markdown':
               return (
