@@ -27,6 +27,8 @@ import EmbedView from './views/Embed'
 import ContainerView from './views/Container'
 import GithubIssueView from './views/GithubIssue'
 import { find } from '../../../../shared/lib/utils/tree'
+import useRealtime from '../../../lib/editor/hooks/useRealtime'
+import { WebsocketProvider } from 'y-websocket'
 
 interface Canvas extends SerializedDocWithBookmark {
   rootBlock: ContainerBlock
@@ -36,6 +38,7 @@ export interface ViewProps<T extends Block> {
   block: T
   actions: BlockActions
   canvas: Canvas
+  realtime: WebsocketProvider
 }
 
 export interface FormProps<T extends Block> {
@@ -52,6 +55,10 @@ const BlockContent = ({ doc }: BlockContentProps) => {
   const { translate } = useI18n()
   const [currentBlock, setCurrentBlock] = useState<Block | null>(null)
   const [showActions, setShowActions] = useState(true)
+  const [provider] = useRealtime({
+    token: doc.collaborationToken || '',
+    id: doc.id,
+  })
 
   const createBlock = useCallback(
     async (block: Omit<Block, 'id'>) => {
@@ -101,19 +108,54 @@ const BlockContent = ({ doc }: BlockContentProps) => {
     const active = currentBlock || state.block
     switch (active.type) {
       case 'container':
-        return <ContainerView block={active} actions={actions} canvas={doc} />
+        return (
+          <ContainerView
+            block={active}
+            actions={actions}
+            canvas={doc}
+            realtime={provider}
+          />
+        )
       case 'embed':
-        return <EmbedView block={active} actions={actions} canvas={doc} />
+        return (
+          <EmbedView
+            block={active}
+            actions={actions}
+            canvas={doc}
+            realtime={provider}
+          />
+        )
       case 'markdown':
-        return <MarkdownView block={active} actions={actions} canvas={doc} />
+        return (
+          <MarkdownView
+            block={active}
+            actions={actions}
+            canvas={doc}
+            realtime={provider}
+          />
+        )
       case 'table':
-        return <TableView block={active} actions={actions} canvas={doc} />
+        return (
+          <TableView
+            block={active}
+            actions={actions}
+            canvas={doc}
+            realtime={provider}
+          />
+        )
       case 'github.issue':
-        return <GithubIssueView block={active} actions={actions} canvas={doc} />
+        return (
+          <GithubIssueView
+            block={active}
+            actions={actions}
+            canvas={doc}
+            realtime={provider}
+          />
+        )
       default:
         return <div>Block of type ${(active as any).type} is unsupported</div>
     }
-  }, [currentBlock, state, actions, doc])
+  }, [currentBlock, state, actions, doc, provider])
 
   if (state.type === 'loading') {
     return <div>loading</div>
