@@ -6,7 +6,6 @@ import { mdiLink } from '@mdi/js'
 import styled from '../../../../../shared/lib/styled'
 
 const GithubIssueView = ({ block }: ViewProps<GithubIssueBlock>) => {
-  console.log(block)
   return (
     <StyledGithubIssueView>
       <h1>{block.data.title}</h1>
