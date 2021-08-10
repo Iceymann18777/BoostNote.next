@@ -13,7 +13,7 @@ import { useTeamIntegrations } from '../../../../../shared/lib/stores/integratio
 import styled from '../../../../../shared/lib/styled'
 import Spinner from '../../../../../shared/components/atoms/Spinner'
 import Icon from '../../../../../shared/components/atoms/Icon'
-import { mdiGithub } from '@mdi/js'
+import { mdiGithub, mdiPlus } from '@mdi/js'
 import { IntegrationActionTypes, getAction } from '../../../../api/integrations'
 import { useToast } from '../../../../../shared/lib/stores/toast'
 import FormSelect from '../../../../../shared/components/molecules/Form/atoms/FormSelect'
@@ -21,6 +21,8 @@ import FormRow from '../../../../../shared/components/molecules/Form/templates/F
 import FormRowItem from '../../../../../shared/components/molecules/Form/templates/FormRowItem'
 import FormInput from '../../../../../shared/components/molecules/Form/atoms/FormInput'
 import Button from '../../../../../shared/components/atoms/Button'
+import ServiceConnect, { Integration } from '../../../atoms/ServiceConnect'
+import { usePage } from '../../../../lib/stores/pageStore'
 
 type State =
   | { stage: 'initialising' }
@@ -29,6 +31,7 @@ type State =
 
 const GithubIssueForm = ({ onSubmit }: FormProps<GithubIssueBlock>) => {
   const integrationState = useTeamIntegrations()
+  const { team } = usePage()
   const [state, setState] = useState<State>({ stage: 'initialising' })
 
   useEffect(() => {
@@ -62,6 +65,18 @@ const GithubIssueForm = ({ onSubmit }: FormProps<GithubIssueBlock>) => {
     [onSubmit]
   )
 
+  const addIntegration = useCallback(
+    (integration: Integration) => {
+      if (
+        integrationState.type !== 'initialising' &&
+        integration.type === 'team'
+      ) {
+        integrationState.actions.addIntegration(integration.integration)
+      }
+    },
+    [integrationState]
+  )
+
   return (
     <GithubIssueFormLayout>
       {(() => {
@@ -69,7 +84,33 @@ const GithubIssueForm = ({ onSubmit }: FormProps<GithubIssueBlock>) => {
           case 'initialising':
             return <Spinner />
           case 'integrate':
-            return <div>Please Integrate</div>
+            return (
+              <StyledIntegrationManager>
+                <div>
+                  <div className='github-issue__form__integrate__icons'>
+                    <img src='/app/static/images/logo_symbol.svg' />
+                    <Icon path={mdiPlus} size={20} />
+                    <img src='/app/static/logos/github.png' />
+                  </div>
+                  <div>
+                    <h1>GitHub</h1>
+                    <p>
+                      Integrate with GitHub to import Issues automatically. You
+                      can check the task progress, assignees, due date and more
+                      at a glance.
+                    </p>
+                    <ServiceConnect
+                      service='github:team'
+                      team={team}
+                      onConnect={addIntegration}
+                    />
+                  </div>
+                </div>
+                <div className='github-issue__form__integrate__splash'>
+                  <img />
+                </div>
+              </StyledIntegrationManager>
+            )
           case 'issue_select':
             return (
               <GithubIssueSelector
@@ -82,6 +123,49 @@ const GithubIssueForm = ({ onSubmit }: FormProps<GithubIssueBlock>) => {
     </GithubIssueFormLayout>
   )
 }
+
+const StyledIntegrationManager = styled.div`
+  padding: 0 ${({ theme }) => theme.sizes.spaces.l}px;
+  display: flex;
+  align-items: center;
+  height: 100%;
+
+  & > div {
+    width: 50%;
+  }
+
+  & .github-issue__form__integrate__icons {
+    display: flex;
+    align-items: center;
+    & > img {
+      height: ${({ theme }) => theme.sizes.fonts.xl * 2}px;
+    }
+
+    & > svg {
+      margin: 0 ${({ theme }) => theme.sizes.spaces.sm}px;
+    }
+  }
+
+  & h1 {
+    font-size: ${({ theme }) => theme.sizes.fonts.xl}px;
+    margin: ${({ theme }) => theme.sizes.spaces.l}px 0;
+  }
+
+  & p {
+    font-size: ${({ theme }) => theme.sizes.fonts.md}px;
+    margin: ${({ theme }) => theme.sizes.spaces.md}px 0;
+  }
+
+  & .github-issue__form__integrate__splash {
+    background-color: #c4c4c4;
+    height: 300px;
+    width: 400px;
+    & > img {
+      width: 100%;
+      height: 100%;
+    }
+  }
+`
 
 interface GithubIssueSelectorProps {
   integrations: SerializedTeamIntegration[]
